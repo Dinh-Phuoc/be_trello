@@ -1,16 +1,25 @@
 /* eslint-disable no-console */
 import express from 'express'
+import cors from 'cors'
+import { corsOptions } from './config/cors'
 import exitHook from 'async-exit-hook'
 
 import { CONNECT_DB, CLOSE_DB } from './config/mongodb'
 import { env } from './config/environment'
 import { APIs_V1 } from './routes/v1'
+import { errorHandlingMiddleware } from './middlewares/errorHandingMiddleware'
 const START_SERVER = () => {
     const app = express()
+
+    app.use(cors(corsOptions))
+
 
     app.use(express.json())
 
     app.use('/v1', APIs_V1)
+
+    //Middleware
+    app.use(errorHandlingMiddleware)
 
     app.listen(env.APP_PORT, env.APP_HOST, () => {
         console.log(`Hello Sariii, You are running at ${ env.APP_HOST }:${ env.APP_PORT }/`)
