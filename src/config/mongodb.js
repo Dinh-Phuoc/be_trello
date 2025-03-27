@@ -18,7 +18,6 @@ export const CONNECT_DB = async () => {
 }
 
 export const CLOSE_DB = async () => {
-    console.log('Closed database')
     clientInstance.close()
 }
 
