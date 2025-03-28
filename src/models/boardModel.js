@@ -1,7 +1,10 @@
 import Joi from 'joi'
-import { ObjectId } from 'mongodb'
+import { ObjectId, ReturnDocument } from 'mongodb'
 import { GET_DB } from '~/config/mongodb'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
+import { BOARD_TYPES } from '~/utils/constants'
+import { columnModel } from './columnModel'
+import { cardModel } from './cardModel'
 
 const BOARD_COLLECTION_NAME = 'boards'
 const BOARD_COLLECTION_SCHEMA = Joi.object({
@@ -16,7 +19,8 @@ const BOARD_COLLECTION_SCHEMA = Joi.object({
     createdAt: Joi.date().timestamp('javascript').default(Date.now()),
     updatedAt: Joi.date().timestamp('javascript').default(null),
 
-    _destroy: Joi.boolean().default(false)
+    _destroy: Joi.boolean().default(false),
+    type: Joi.string().valid(BOARD_TYPES.PUBLIC, BOARD_TYPES.PRIVATE).required()
 })
 
 const validateBeforeCreate = async (data) => {
@@ -44,18 +48,50 @@ const findOneById = async (id) => {
 
 const getDetails = async (boardId) => {
     try {
-        return await GET_DB().collection(BOARD_COLLECTION_NAME).findOne({
-            _id: new ObjectId(boardId)
-        })
+        const result = await GET_DB().collection(BOARD_COLLECTION_NAME).aggregate([
+            { $match: {
+                _id: new ObjectId(boardId),
+                _destroy: false
+            } },
+            { $lookup: {
+                from: columnModel.COLUMN_COLLECTION_NAME,
+                localField: '_id',
+                foreignField: 'boardId',
+                as: 'columns'
+            } },
+            { $lookup: {
+                from: cardModel.CARD_COLLECTION_NAME,
+                localField: '_id',
+                foreignField: 'boardId',
+                as: 'cards'
+            } }
+        ]).toArray()
+        return result[0] || null
+        // return await GET_DB().collection(BOARD_COLLECTION_NAME).findOne({
+        //     _id: new ObjectId(boardId)
+        // })
     } catch (error) {
         throw new Error(error)
     }
 }
 
+const pushColumnOrderIds = async (column) => {
+    try {
+        const result = await GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate(
+            { _id: new ObjectId(column.boardId) },
+            { $push: { columnOrderIds: new ObjectId(column._id) } },
+            { returnDocument: 'after' }
+        )
+        return result.value
+    } catch (error) {
+        throw new Error(error)
+    }
+}
 export const boardModel = {
     BOARD_COLLECTION_NAME,
     BOARD_COLLECTION_SCHEMA,
     createNew,
     findOneById,
-    getDetails
+    getDetails,
+    pushColumnOrderIds
 }
