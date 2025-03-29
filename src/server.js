@@ -21,9 +21,15 @@ const START_SERVER = () => {
     //Middleware
     app.use(errorHandlingMiddleware)
 
-    app.listen(env.APP_PORT, env.APP_HOST, () => {
-        console.log(`Hello Sariii, You are running at ${ env.APP_HOST }:${ env.APP_PORT }/`)
-    })
+    if (env.BUILD_MODE === 'prod') {
+        app.listen(process.env.PORT, () => {
+            console.log(`Production: Hello Sariii, You are running at ${ process.env.APP_PORT }/`)
+        })
+    } else {
+        app.listen(env.APP_PORT, env.APP_HOST, () => {
+            console.log(`Dev: Hello Sariii, You are running at ${ env.APP_HOST }:${ env.APP_PORT }/`)
+        })
+    }
 
     exitHook(async () => {
         console.log('Server is Shutting Down')
