@@ -1,6 +1,8 @@
 import { StatusCodes } from 'http-status-codes'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, reduce } from 'lodash'
 import { boardModel } from '~/models/boardModel'
+import { cardModel } from '~/models/cardModel'
+import { columnModel } from '~/models/columnModel'
 import ApiError from '~/utils/ApiError'
 import { slugify } from '~/utils/formartter'
 
@@ -18,10 +20,9 @@ const createNew = async (reqBody) => {
 const getDetails = async (boardId) => {
     const board = await boardModel.getDetails(boardId)
     if (!board) throw new ApiError(StatusCodes.NOT_FOUND, 'Board not found')
-    console.log(board)
     const resBoard = cloneDeep(board)
     resBoard.columns.forEach(column => {
-        column.cards = resBoard.cards.filter(card => card.columnId.toString() === column._id.toString())
+        column.cards = resBoard.cards.filter(card => card.columnId.equals(column._id))
     })
 
     delete resBoard.cards
@@ -29,7 +30,38 @@ const getDetails = async (boardId) => {
     return resBoard
 }
 
+const update = async (boardId, reqBody) => {
+    const updateData = {
+        ...reqBody,
+        updatedAt: Date.now()
+    }
+    const updatedBoard = await boardModel.update(boardId, updateData)
+
+    return updatedBoard
+}
+
+const moveCardToDifferentColumn = async (reqBody) => {
+    //Update the old cardOrderIds array
+    await columnModel.update(reqBody.oldColumnId, {
+        cardOrderIds: reqBody.oldCardOrderIds,
+        updatedAt: Date.now()
+    })
+    //Update the new cardOrderIds array
+    await columnModel.update(reqBody.newColumnId, {
+        cardOrderIds: reqBody.newCardOrderIds,
+        updatedAt: Date.now()
+    })
+
+    await cardModel.update(reqBody.currentCardId, {
+        columnId: reqBody.newColumnId
+    })
+
+    return { updateMessage: 'Success' }
+}
+
 export const boardService = {
     createNew,
-    getDetails
+    getDetails,
+    update,
+    moveCardToDifferentColumn
 }

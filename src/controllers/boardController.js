@@ -15,7 +15,6 @@ const createNew = async (req, res, next) => {
 const getDetails = async (req, res, next) => {
     try {
         const boardId = req.params.id
-        console.log(boardId)
         const board = await boardService.getDetails(boardId)
         res.status(StatusCodes.OK).json(board)
     } catch (error) {
@@ -23,7 +22,28 @@ const getDetails = async (req, res, next) => {
     }
 }
 
+const update = async (req, res, next) => {
+    try {
+        const boardId = req.params.id
+        const updateBoard = await boardService.update(boardId, req.body)
+        res.status(StatusCodes.OK).json(updateBoard)
+    } catch (error) {
+        next(error)
+    }
+}
+
+const moveCardToDifferentColumn = async (req, res, next) => {
+    try {
+        const result = await boardService.moveCardToDifferentColumn(req.body)
+        res.status(StatusCodes.OK).json(result)
+    } catch (error) {
+        next(error)
+    }
+}
+
 export const boardController = {
     createNew,
-    getDetails
+    getDetails,
+    update,
+    moveCardToDifferentColumn
 }
