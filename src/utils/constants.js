@@ -1,5 +1,5 @@
 export const WHITELIST_DOMAINS = [
-    'https://fullstack-basic-sand.vercel.app/'
+    'https://fullstack-basic-sand.vercel.app'
 ]
 
 export const BOARD_TYPES = {
