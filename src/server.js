@@ -34,7 +34,6 @@ const START_SERVER = () => {
     exitHook(async () => {
         console.log('Server is Shutting Down')
         await CLOSE_DB()
-        console.log('Absolute disconnect')
     })
 }
 
