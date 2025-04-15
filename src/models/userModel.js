@@ -1,9 +1,7 @@
 import Joi from 'joi'
 import bcrypt from 'bcrypt'
 import { GET_DB } from '~/config/mongodb'
-import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 import { USER_ROLE } from '~/utils/constants'
-import { ObjectId } from 'mongodb'
 
 const USER_COLLECTION_NAME = 'users'
 const USER_COLLECTION_SCHEMA = Joi.object({
@@ -37,10 +35,18 @@ const register = async (data) => {
     }
 }
 
-const login = async (id) => {
+const login = async (data) => {
     try {
         return await GET_DB().collection(USER_COLLECTION_NAME).findOne({
-            _id: new ObjectId(id)
+            $or:[
+                { userName: data.userName },
+                {
+                    $and: [
+                        { userName: data.userName },
+                        { password: data.password }
+                    ]
+                }
+            ]
         })
     } catch (error) {
         throw new Error(error)

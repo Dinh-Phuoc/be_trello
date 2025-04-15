@@ -6,7 +6,7 @@ import { columnRoute } from './columnRoute'
 import { cardRoute } from './cardRoute'
 import { loginRoute } from './loginRoute'
 import { registerRoute } from './registerRoute'
-
+import { profileRoute } from './profileRoute'
 
 const Router = express.Router()
 
@@ -20,5 +20,6 @@ Router.use('/columns', columnRoute)
 Router.use('/cards', cardRoute)
 Router.use('/login', loginRoute)
 Router.use('/register', registerRoute)
+Router.use('/profile', profileRoute)
 
 export const APIs_V1 = Router
