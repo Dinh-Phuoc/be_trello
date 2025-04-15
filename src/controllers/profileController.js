@@ -5,7 +5,6 @@ import { profileService } from '~/services/profileService'
 
 const getInfo = async (req, res, next) => {
     try {
-        console.log(req.headers.authorization)
         const token = req.headers.authorization?.slice(7)
         if (!token) {
             return res.status(StatusCodes.UNAUTHORIZED)

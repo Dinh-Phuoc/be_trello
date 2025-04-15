@@ -19,7 +19,7 @@ const createNew = async (reqBody) => {
 
 const login = async (body) => {
     const user = await userModel.login(body)
-    if (!user) throw new ApiError(StatusCodes.NOT_FOUND, 'Tài khoản hoặc mật khẩu không chính xác')
+    if (!user) return new ApiError(StatusCodes.NOT_FOUND, 'Tài khoản hoặc mật khẩu không chính xác')
 
     const header = {
         alg: 'HS256',
