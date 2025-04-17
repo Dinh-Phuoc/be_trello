@@ -3,8 +3,8 @@ import { registerService } from '~/services/registerService'
 
 const register = async (req, res, next) => {
     try {
-        const register = await registerService.register(req.body)
-        res.status(StatusCodes.OK).json(register)
+        const messageRegister = await registerService.register(req.body)
+        res.status(StatusCodes.OK).json(messageRegister)
     } catch (error) {
         next(error)
     }

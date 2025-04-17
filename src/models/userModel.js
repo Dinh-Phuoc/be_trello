@@ -2,6 +2,7 @@ import Joi from 'joi'
 import bcrypt from 'bcrypt'
 import { GET_DB } from '~/config/mongodb'
 import { USER_ROLE } from '~/utils/constants'
+import { ObjectId } from 'mongodb'
 
 const USER_COLLECTION_NAME = 'users'
 const USER_COLLECTION_SCHEMA = Joi.object({
