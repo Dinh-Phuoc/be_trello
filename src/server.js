@@ -3,6 +3,7 @@ import express from 'express'
 import cors from 'cors'
 import { corsOptions } from './config/cors'
 import exitHook from 'async-exit-hook'
+import path from 'path'
 
 import { CONNECT_DB, CLOSE_DB } from './config/mongodb'
 import { env } from './config/environment'
@@ -13,6 +14,7 @@ const START_SERVER = () => {
 
     app.use(cors(corsOptions))
 
+    app.use('/uploads', express.static(path.join(__dirname, 'upload')))
 
     app.use(express.json())
 
@@ -22,8 +24,8 @@ const START_SERVER = () => {
     app.use(errorHandlingMiddleware)
 
     if (env.BUILD_MODE === 'prod') {
-        app.listen(process.env.PORT, () => {
-            console.log(`Production: Hello Sariii, You are running at ${ process.env.PORT }/`)
+        app.listen(env.APP_PORT, () => {
+            console.log(`Production: Hello Sariii, You are running at ${ env.APP_PORT }/`)
         })
     } else {
         app.listen(env.APP_PORT, env.APP_HOST, () => {

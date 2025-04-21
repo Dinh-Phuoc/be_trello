@@ -1,5 +1,5 @@
 export const WHITELIST_DOMAINS = [
-    'https://fullstack-basic-sand.vercel.app'
+    'http://rookie.io.vn'
 ]
 
 export const BOARD_TYPES = {
