@@ -10,8 +10,12 @@ Router.route('/')
     .get(profileController.getInfo)
 
 Router.route('/upload/image-header/:id')
-    .post(uploadImageMiddleware.uploadImageHeader.single('image-header'), uploadImageController.uploadFile)
-Router.route('/upload/avatar/:id')
-    .post(uploadImageMiddleware.uploadAvatar.single('avatar'), uploadImageController.uploadFile)
+    .patch(uploadImageMiddleware.uploadImageHeader.single('image-header'), uploadImageController.uploadImageHeader)
+Router.route('/getImage/image-header/:id/')
+    .get(uploadImageController.getImageHeader)
 
+Router.route('/upload/avatar/:id')
+    .patch(uploadImageMiddleware.uploadAvatar.single('avatar'), uploadImageController.uploadAvatar)
+Router.route('/getImage/avatar/:id/')
+    .get(uploadImageController.getAvatar)
 export const profileRoute = Router

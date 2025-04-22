@@ -54,10 +54,53 @@ const login = async (data) => {
     }
 }
 
+const update = async(fieldName, data) => {
+    try {
+        switch (fieldName) {
+        case 'imageHeader':
+            return await GET_DB().collection(USER_COLLECTION_NAME).updateOne(
+                { _id: new ObjectId(data.id) },
+                { $set: { imageHeader: data.imageHeaderFileName } }
+            )
+        case 'avatar':
+            return await GET_DB().collection(USER_COLLECTION_NAME).updateOne(
+                { _id: new ObjectId(data.id) },
+                { $set: { avatar: data.avatarFileName } }
+            )
+        default:
+            throw new Error('Field không hợp lệ')
+        }
+    } catch (error) {
+        throw new Error(error)
+    }
+}
+
+const getImage = async(fieldName, id) => {
+    try {
+        switch (fieldName) {
+        case 'imageHeader':
+            return await GET_DB().collection(USER_COLLECTION_NAME).findOne(
+                { _id: new ObjectId(id) },
+                { projection: { imageHeader: 1, _id: 0 } }
+            )
+        case 'avatar':
+            return await GET_DB().collection(USER_COLLECTION_NAME).findOne(
+                { _id: new ObjectId(id) },
+                { projection: { avatar: 1, _id: 0 } }
+            )
+        default:
+            throw new Error('Field không hợp lệ')
+        }
+    } catch (error) {
+        throw new Error(error)
+    }
+}
 
 export const userModel = {
     USER_COLLECTION_NAME,
     USER_COLLECTION_SCHEMA,
     register,
-    login
+    login,
+    update,
+    getImage
 }
