@@ -6,12 +6,12 @@ import { ObjectId } from 'mongodb'
 
 const USER_COLLECTION_NAME = 'users'
 const USER_COLLECTION_SCHEMA = Joi.object({
-    userName: Joi.string().required().min(3).max(50).trim().strict(),
+    userName: Joi.string().min(3).max(50).trim().strict().required(),
+    email: Joi.string().min(3).max(256).trim().strict().required(),
+    password: Joi.string().min(3).trim().strict().required(),
     fullName: Joi.string().min(3).max(50).trim().strict(),
-    password: Joi.string().required().min(3).trim().strict(),
-    gmail: Joi.string().min(3).max(256).trim().strict(),
-    phone: Joi.string().min(3).max(256).trim().strict(),
-    avatar: Joi.string().min(3).trim().strict(),
+    phone: Joi.string().min(3).max(256).trim().strict().default(''),
+    avatar: Joi.string().min(3).trim().strict().default(''),
 
     _destroy: Joi.boolean().default(false),
     role: Joi.string().valid(USER_ROLE.ADMIN, USER_ROLE.GUEST).default('guest'),
@@ -20,6 +20,9 @@ const USER_COLLECTION_SCHEMA = Joi.object({
 })
 
 const validateBeforeCreate = async (data) => {
+    if (!data.fullName) {
+        data.fullName = data.userName
+    }
     return await USER_COLLECTION_SCHEMA.validateAsync(data, { abortEarly: false })
 }
 
@@ -36,17 +39,20 @@ const register = async (data) => {
     }
 }
 
+const getUser = async (payload) => {
+    try {
+        return await GET_DB().collection(USER_COLLECTION_NAME).findOne({ userName: payload.userName })
+    } catch (error) {
+        throw new Error(error)
+    }
+}
+
 const login = async (data) => {
     try {
         return await GET_DB().collection(USER_COLLECTION_NAME).findOne({
-            $or:[
+            $and: [
                 { userName: data.userName },
-                {
-                    $and: [
-                        { userName: data.userName },
-                        { password: data.password }
-                    ]
-                }
+                { password: data.password }
             ]
         })
     } catch (error) {
@@ -54,43 +60,24 @@ const login = async (data) => {
     }
 }
 
-const update = async(fieldName, data) => {
+const updateProfile = async(fieldName, id, data) => {
     try {
-        switch (fieldName) {
-        case 'imageHeader':
-            return await GET_DB().collection(USER_COLLECTION_NAME).updateOne(
-                { _id: new ObjectId(data.id) },
-                { $set: { imageHeader: data.imageHeaderFileName } }
-            )
-        case 'avatar':
-            return await GET_DB().collection(USER_COLLECTION_NAME).updateOne(
-                { _id: new ObjectId(data.id) },
-                { $set: { avatar: data.avatarFileName } }
-            )
-        default:
-            throw new Error('Field không hợp lệ')
-        }
+        const messageUpload = await GET_DB().collection(USER_COLLECTION_NAME).updateOne(
+            { _id: new ObjectId(id) },
+            { $set: { [fieldName]: data } }
+        )
+        return messageUpload
     } catch (error) {
         throw new Error(error)
     }
 }
 
-const getImage = async(fieldName, id) => {
+const getOne = async(fieldName, id) => {
     try {
-        switch (fieldName) {
-        case 'imageHeader':
-            return await GET_DB().collection(USER_COLLECTION_NAME).findOne(
-                { _id: new ObjectId(id) },
-                { projection: { imageHeader: 1, _id: 0 } }
-            )
-        case 'avatar':
-            return await GET_DB().collection(USER_COLLECTION_NAME).findOne(
-                { _id: new ObjectId(id) },
-                { projection: { avatar: 1, _id: 0 } }
-            )
-        default:
-            throw new Error('Field không hợp lệ')
-        }
+        return await GET_DB().collection(USER_COLLECTION_NAME).findOne(
+            { _id: new ObjectId(id) },
+            { projection: { [fieldName]: 1, _id: 0 } }
+        )
     } catch (error) {
         throw new Error(error)
     }
@@ -101,6 +88,7 @@ export const userModel = {
     USER_COLLECTION_SCHEMA,
     register,
     login,
-    update,
-    getImage
+    updateProfile,
+    getOne,
+    getUser
 }
