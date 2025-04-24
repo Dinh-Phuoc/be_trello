@@ -3,6 +3,7 @@ import fs from 'fs-extra'
 import path from 'path'
 import { env } from 'process'
 import crypto from 'crypto'
+import bcrypt from 'bcrypt'
 
 import { userService } from '~/services/userService'
 
@@ -79,9 +80,41 @@ const uploadAvatar = async (req, res, next) => {
 
 const updateProfile = async (req, res, next) => {
     try {
-        const uploadAvatarName = await userService.updateProfile(req.params.fieldName, req.params.id, req.body.data)
-        uploadAvatarName && res.status(StatusCodes.OK).json({
-            message: `Cập nhật ${req.params.fieldName} thành công`
+        if (req.params.fieldName === 'password') {
+            const payload = {
+                id: req.params.id,
+                presentPassword: req.body.presentPassword,
+                newPassword: req.body.newPassword
+            }
+            const token = req.headers.authorization?.slice(7)
+            if (!token) {
+                return res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Bro chưa xác thực' })
+            }
+
+            const [headerEncoded, payloadEncoded, tokenSignature] = token.split('.')
+            const tokenData = `${headerEncoded}.${payloadEncoded}`
+
+            const hmac = crypto.createHmac('sha256', env.SECRETKEY)
+            const signature = hmac.update(tokenData).digest('base64url')
+
+            if (tokenSignature === signature) {
+                const info = await userService.getUser(payload)
+
+                const isMatch = await bcrypt.compare(payload.presentPassword, info.password)
+                if (!isMatch) {
+                    return res.json({ change: false, message: 'Mật khẩu hiện tại không chính xác' })
+                }
+
+                await userService.updateProfile(req.params.fieldName, req.params.id, payload.newPassword)
+
+                return res.json({ change: true, message: 'Đổi mật khẩu thành công' })
+            }
+        }
+
+        const updateMessage = await userService.updateProfile(req.params.fieldName, req.params.id, req.body.data)
+        updateMessage && res.status(StatusCodes.OK).json({
+            change: true,
+            message: 'Cập nhật thành công'
         })
     } catch (error) {
         next(error)

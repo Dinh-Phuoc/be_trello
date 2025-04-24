@@ -1,5 +1,6 @@
 export const WHITELIST_DOMAINS = [
-    'http://rookie.io.vn'
+    'http://rookie.io.vn',
+    'https://rookie.io.vn'
 ]
 
 export const BOARD_TYPES = {

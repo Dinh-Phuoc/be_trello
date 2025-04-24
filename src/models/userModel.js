@@ -41,7 +41,12 @@ const register = async (data) => {
 
 const getUser = async (payload) => {
     try {
-        return await GET_DB().collection(USER_COLLECTION_NAME).findOne({ userName: payload.userName })
+        return await GET_DB().collection(USER_COLLECTION_NAME).findOne({ 
+            $or: [
+                { userName: payload.userName },
+                { _id: new ObjectId(payload.id) }
+            ]
+        })
     } catch (error) {
         throw new Error(error)
     }
@@ -62,6 +67,13 @@ const login = async (data) => {
 
 const updateProfile = async(fieldName, id, data) => {
     try {
+        if (fieldName === 'password') {
+            const messageUpload = await GET_DB().collection(USER_COLLECTION_NAME).updateOne(
+                { _id: new ObjectId(id) },
+                { $set: { [fieldName]: await bcrypt.hash(data, 10) } }
+            )
+            return messageUpload
+        }
         const messageUpload = await GET_DB().collection(USER_COLLECTION_NAME).updateOne(
             { _id: new ObjectId(id) },
             { $set: { [fieldName]: data } }

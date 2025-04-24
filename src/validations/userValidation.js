@@ -35,10 +35,17 @@ const register = async (req, res, next) => {
 
 const updateProfile = async (req, res, next) => {
     const correctCondition = Joi.object({
-        data: Joi.string().trim().strict()
+        data: Joi.string().trim().strict(),
+        presentPassword: Joi.string().min(6).trim().strict(),
+        newPassword: Joi.string().min(6).trim().strict()
     })
 
     try {
+        if (req.params.fieldName === 'password') {
+            const data = req.body
+            await correctCondition.validateAsync(data, { abortEarly: false })
+            return next()
+        }
         await correctCondition.validateAsync(req.body, { abortEarly: false })
         next()
     } catch (error) {

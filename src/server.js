@@ -12,6 +12,8 @@ import { errorHandlingMiddleware } from './middlewares/errorHandingMiddleware'
 const START_SERVER = () => {
     const app = express()
 
+    app.enable('trust proxy')
+
     app.use(cors(corsOptions))
 
     app.use('/uploads', express.static(path.join(__dirname, 'upload')))
