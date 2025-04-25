@@ -41,23 +41,10 @@ const register = async (data) => {
 
 const getUser = async (payload) => {
     try {
-        return await GET_DB().collection(USER_COLLECTION_NAME).findOne({ 
+        return await GET_DB().collection(USER_COLLECTION_NAME).findOne({
             $or: [
                 { userName: payload.userName },
                 { _id: new ObjectId(payload.id) }
-            ]
-        })
-    } catch (error) {
-        throw new Error(error)
-    }
-}
-
-const login = async (data) => {
-    try {
-        return await GET_DB().collection(USER_COLLECTION_NAME).findOne({
-            $and: [
-                { userName: data.userName },
-                { password: data.password }
             ]
         })
     } catch (error) {
@@ -99,7 +86,6 @@ export const userModel = {
     USER_COLLECTION_NAME,
     USER_COLLECTION_SCHEMA,
     register,
-    login,
     updateProfile,
     getOne,
     getUser

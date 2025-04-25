@@ -3,7 +3,6 @@ import fs from 'fs-extra'
 import path from 'path'
 import { env } from 'process'
 import crypto from 'crypto'
-import bcrypt from 'bcrypt'
 
 import { userService } from '~/services/userService'
 
@@ -81,34 +80,14 @@ const uploadAvatar = async (req, res, next) => {
 const updateProfile = async (req, res, next) => {
     try {
         if (req.params.fieldName === 'password') {
-            const payload = {
+            const data = {
                 id: req.params.id,
                 presentPassword: req.body.presentPassword,
-                newPassword: req.body.newPassword
+                newPassword: req.body.newPassword,
+                token: req.headers.authorization?.slice(7)
             }
-            const token = req.headers.authorization?.slice(7)
-            if (!token) {
-                return res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Bro chưa xác thực' })
-            }
-
-            const [headerEncoded, payloadEncoded, tokenSignature] = token.split('.')
-            const tokenData = `${headerEncoded}.${payloadEncoded}`
-
-            const hmac = crypto.createHmac('sha256', env.SECRETKEY)
-            const signature = hmac.update(tokenData).digest('base64url')
-
-            if (tokenSignature === signature) {
-                const info = await userService.getUser(payload)
-
-                const isMatch = await bcrypt.compare(payload.presentPassword, info.password)
-                if (!isMatch) {
-                    return res.json({ change: false, message: 'Mật khẩu hiện tại không chính xác' })
-                }
-
-                await userService.updateProfile(req.params.fieldName, req.params.id, payload.newPassword)
-
-                return res.json({ change: true, message: 'Đổi mật khẩu thành công' })
-            }
+            const result = await userService.changePassword('password', data)
+            return res.status(StatusCodes.OK).json(result)
         }
 
         const updateMessage = await userService.updateProfile(req.params.fieldName, req.params.id, req.body.data)
