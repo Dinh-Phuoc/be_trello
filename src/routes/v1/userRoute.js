@@ -25,8 +25,8 @@ Router.route('/profile/upload/image-header/:id')
         uploadImageMiddleware.uploadImageHeader.single('image-header'),
         userController.uploadImageHeader)
 
-Router.route('/profile/get-image/image-header/:id/')
-    .get(userController.getImageHeader)
+// Router.route('/profile/get-image/image-header/:id/')
+//     .get(userController.getImageHeader)
 
 Router.route('/profile/upload/avatar/:id')
     .patch(
@@ -35,7 +35,7 @@ Router.route('/profile/upload/avatar/:id')
         userController.uploadAvatar
     )
 
-Router.route('/profile/get-image/avatar/:id/')
-    .get(userController.getAvatar)
+// Router.route('/profile/get-image/avatar/:id/')
+//     .get(userController.getAvatar)
 
 export const userRoute = Router

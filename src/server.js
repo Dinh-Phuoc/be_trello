@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import express from 'express'
 import cors from 'cors'
-import { corsOptions } from './config/cors'
+import { corsOptions, allowCorsForImage } from './config/cors'
 import exitHook from 'async-exit-hook'
 import path from 'path'
 
@@ -9,10 +9,14 @@ import { CONNECT_DB, CLOSE_DB } from './config/mongodb'
 import { env } from './config/environment'
 import { APIs_V1 } from './routes/v1'
 import { errorHandlingMiddleware } from './middlewares/errorHandingMiddleware'
+import { userController } from './controllers/userController'
 const START_SERVER = () => {
     const app = express()
 
     app.enable('trust proxy')
+
+    app.get('/v1/manage/users/profile/get-image/avatar/:id', cors(allowCorsForImage), userController.getAvatar)
+    app.get('/v1/manage/users/profile/get-image/image-header/:id', cors(allowCorsForImage), userController.getImageHeader)
 
     app.use(cors(corsOptions))
 

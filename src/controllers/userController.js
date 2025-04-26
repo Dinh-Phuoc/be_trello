@@ -108,6 +108,8 @@ const getImageHeader = async (req, res, next) => {
         const imageHeaderFileExists = await fs.pathExists(imageHeaderFileNamePath)
         if (!imageHeaderFileExists) return res.status(StatusCodes.NOT_FOUND).message('Không tìm thấy ảnh')
 
+        res.setHeader('Access-Control-Allow-Origin', 'https://rookie.io.vn')
+        res.setHeader('Access-Control-Allow-Credentials', 'true')
         res.sendFile(imageHeaderFileNamePath)
     } catch (error) {
         next(error)
@@ -122,6 +124,8 @@ const getAvatar = async (req, res, next) => {
         const avatarFileExists = await fs.pathExists(avatarFileNamePath)
         if (!avatarFileExists) return res.status(StatusCodes.NOT_FOUND).message('Không tìm thấy ảnh')
 
+        res.setHeader('Access-Control-Allow-Origin', 'https://rookie.io.vn')
+        res.setHeader('Access-Control-Allow-Credentials', 'true')
         res.sendFile(avatarFileNamePath)
     } catch (error) {
         next(error)
