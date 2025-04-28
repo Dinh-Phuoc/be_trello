@@ -122,8 +122,8 @@ const getAvatar = async (req, res, next) => {
         const avatarFileNamePath = path.join(__dirname, `../uploads/avatar/${req.params.id}/`, avatarFileName)
 
         const avatarFileExists = await fs.pathExists(avatarFileNamePath)
-        if (!avatarFileExists) return res.status(StatusCodes.NOT_FOUND).message('Không tìm thấy ảnh')
 
+        if (!avatarFileExists) return res.status(StatusCodes.NOT_FOUND).message('Không tìm thấy ảnh')
         res.setHeader('Access-Control-Allow-Origin', 'https://rookie.io.vn')
         res.setHeader('Access-Control-Allow-Credentials', 'true')
         res.sendFile(avatarFileNamePath)

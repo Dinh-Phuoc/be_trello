@@ -5,7 +5,6 @@ import ApiError from '~/utils/ApiError'
 
 export const corsOptions = {
     origin: function (origin, callback) {
-    console.log('🚀 ~ origin:', origin)
 
         if (env.BUILD_MODE === 'dev') {
             return callback(null, true)
@@ -25,8 +24,6 @@ export const corsOptions = {
 
 export const allowCorsForImage = {
     origin: function (origin, callback) {
-    console.log('🚀 ~ origin:', origin)
-
         if (!origin || origin === 'null' || origin === 'https://rookie.io.vn') {
             return callback(null, true)
         }
