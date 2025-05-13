@@ -8,7 +8,7 @@ const Router = express.Router()
 Router.route('/')
     .post(columnValidation.createNew, columnController.createNew)
 
-Router.route('/:id')
+Router.route('/:uuid')
     .put(columnValidation.update, columnController.update)
     .delete(columnValidation.deleteColumn, columnController.deleteColumn)
 

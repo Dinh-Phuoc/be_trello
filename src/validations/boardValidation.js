@@ -7,8 +7,9 @@ import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 const createNew = async (req, res, next) => {
     const correctCondition = Joi.object({
         title: Joi.string().required().min(3).max(50).trim().strict(),
-        description: Joi.string().required().min(3).max(256).trim().strict(),
-        type: Joi.string().valid(BOARD_TYPES.PUBLIC, BOARD_TYPES.PRIVATE).required()
+        description: Joi.string().min(3).max(256).trim().strict(),
+        type: Joi.string().valid(BOARD_TYPES.PUBLIC, BOARD_TYPES.PRIVATE).required(),
+        uuid: Joi.string().pattern(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i).required().strict()
     })
 
     try {
@@ -23,7 +24,8 @@ const update = async (req, res, next) => {
     const correctCondition = Joi.object({
         title: Joi.string().min(3).max(50).trim().strict(),
         description: Joi.string().min(3).max(256).trim().strict(),
-        type: Joi.string().valid(BOARD_TYPES.PUBLIC, BOARD_TYPES.PRIVATE)
+        type: Joi.string().valid(BOARD_TYPES.PUBLIC, BOARD_TYPES.PRIVATE),
+        uuid: Joi.string().pattern(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i)
     })
 
     try {

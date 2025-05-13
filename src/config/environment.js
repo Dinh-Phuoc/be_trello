@@ -1,10 +1,12 @@
 import 'dotenv/config'
 
 export const env = {
+    AUTHOR_PORT: process.env.AUTHOR_PORT,
     APP_HOST: process.env.APP_HOST,
     APP_PORT: process.env.APP_PORT,
     MONGODB_URI: process.env.MONGODB_URI,
     DATABASE_NAME: process.env.DATABASE_NAME,
     BUILD_MODE: process.env.BUILD_MODE,
-    SECRETKEY: process.env.SECRETKEY
+    SECRETKEY: process.env.SECRETKEY,
+    REFRESH_SECRETKEY: process.env.REFRESH_SECRETKEY
 }

@@ -10,7 +10,8 @@ const BOARD_COLLECTION_NAME = 'boards'
 const BOARD_COLLECTION_SCHEMA = Joi.object({
     title: Joi.string().required().min(3).max(50).trim().strict(),
     slug: Joi.string().required().min(3).trim().strict(),
-    description: Joi.string().required().min(3).max(256).trim().strict(),
+    description: Joi.string().min(3).max(256).trim().strict(),
+    uuid: Joi.string().pattern(/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i).required(),
 
     columnOrderIds: Joi.array().items(
         Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
@@ -41,30 +42,33 @@ const createNew = async (data) => {
 const findOneById = async (id) => {
     try {
         return await GET_DB().collection(BOARD_COLLECTION_NAME).findOne({
-            _id: new ObjectId(id)
+            $or: [
+                { id: id },
+                { _id: new ObjectId(id) }
+            ]
         })
     } catch (error) {
         throw new Error(error)
     }
 }
 
-const getDetails = async (boardId) => {
+const getDetails = async (boardUuid) => {
     try {
         const result = await GET_DB().collection(BOARD_COLLECTION_NAME).aggregate([
             { $match: {
-                _id: new ObjectId(boardId),
+                uuid: boardUuid,
                 _destroy: false
             } },
             { $lookup: {
                 from: columnModel.COLUMN_COLLECTION_NAME,
-                localField: '_id',
-                foreignField: 'boardId',
+                localField: 'uuid',
+                foreignField: 'boardUuid',
                 as: 'columns'
             } },
             { $lookup: {
                 from: cardModel.CARD_COLLECTION_NAME,
-                localField: '_id',
-                foreignField: 'boardId',
+                localField: 'uuid',
+                foreignField: 'boardUuid',
                 as: 'cards'
             } }
         ]).toArray()
@@ -93,8 +97,8 @@ const pushColumnOrderIds = async (column) => {
 const pullColumnOrderIds = async (column) => {
     try {
         const result = await GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate(
-            { _id: new ObjectId(column.boardId) },
-            { $pull: { columnOrderIds: new ObjectId(column._id) } },
+            { uuid: column.boardUuid },
+            { $pull: { columnOrderIds: column.uuid } },
             { returnDocument: 'after' }
         )
         return result
@@ -112,10 +116,10 @@ const update = async (boardId, updateData) => {
         })
 
         if (updateData.columnOrderIds) {
-            updateData.columnOrderIds = updateData.columnOrderIds.map(_id => new ObjectId(_id))
+            updateData.columnOrderIds = updateData.columnOrderIds.map( id => id)
         }
         const result = await GET_DB().collection(BOARD_COLLECTION_NAME).findOneAndUpdate(
-            { _id: new ObjectId(boardId) },
+            { id: boardId },
             { $set: updateData },
             { returnDocument: 'after' }
         )

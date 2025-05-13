@@ -7,12 +7,9 @@ import { boardController } from '~/controllers/boardController'
 const Router = express.Router()
 
 Router.route('/')
-    .get((req, res) => {
-        res.status(StatusCodes.OK).json({ message: 'GET: APIs get list post' })
-    })
     .post(boardValidation.createNew, boardController.createNew)
 
-Router.route('/:id')
+Router.route('/:uuid')
     .get(boardController.getDetails)
     .put(boardValidation.update, boardController.update)
 

@@ -5,8 +5,9 @@ import ApiError from '~/utils/ApiError'
 import { OBJECT_ID_RULE, OBJECT_ID_RULE_MESSAGE } from '~/utils/validators'
 const createNew = async (req, res, next) => {
     const correctCondition = Joi.object({
-        boardId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
-        title: Joi.string().required().min(3).trim().strict()
+        boardUuid: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+        title: Joi.string().required().min(3).trim().strict(),
+        uuid: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
     })
 
     try {
@@ -19,7 +20,7 @@ const createNew = async (req, res, next) => {
 
 const update = async (req, res, next) => {
     const correctCondition = Joi.object({
-        boardId: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+        boardUuid: Joi.string().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
         title: Joi.string().min(3).trim().strict()
     })
 
@@ -36,7 +37,7 @@ const update = async (req, res, next) => {
 
 const deleteColumn = async (req, res, next) => {
     const correctCondition = Joi.object({
-        id: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
+        uuid: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE)
     })
 
     try {

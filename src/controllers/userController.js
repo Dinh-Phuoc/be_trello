@@ -1,15 +1,54 @@
 import { StatusCodes } from 'http-status-codes'
 import fs from 'fs-extra'
 import path from 'path'
-import { env } from 'process'
-import crypto from 'crypto'
-
 import { userService } from '~/services/userService'
 
 const login = async (req, res, next) => {
     try {
-        const login = await userService.login(req.body)
-        res.status(StatusCodes.OK).json(login)
+        const token = await userService.login(req.body)
+        res.cookie('accessToken', token.accessToken, {
+            httpOnly: true,
+            maxAge: 60 * 60 * 2 * 1000
+        }).cookie('refreshToken', token.refreshToken, {
+            httpOnly: true,
+            maxAge: 60 * 60 * 12 * 1000
+        })
+        return res.status(StatusCodes.OK).json({ message: 'Đăng nhập thành công!' })
+    } catch (error) {
+        next(error)
+    }
+}
+
+const logout = async (req, res, next) => {
+    try {
+        const token = req.cookies.accessToken
+
+        await userService.logout(token)
+        res.clearCookie('accessToken')
+        res.clearCookie('refreshToken')
+        return res.status(StatusCodes.OK).json({ message: 'Đăng nhập thành công!' })
+    } catch (error) {
+        next(error)
+    }
+}
+
+const refresh = async (req, res, next) => {
+    try {
+        const newToken = await userService.refresh(req.cookies)
+        if (newToken.statusCode) {
+            res.clearCookie('refreshToken')
+            res.clearCookie('accessToken')
+            return res.status(newToken.statusCode).json({ statusCode: newToken.message })
+        }
+
+        res.cookie('accessToken', newToken.accessToken, {
+            httpOnly: true,
+            maxAge: 60 * 2 * 1000
+        }).cookie('refreshToken', newToken.refreshToken, {
+            httpOnly: true,
+            maxAge: 60 * 60 * 12 * 1000
+        })
+        return res.status(StatusCodes.OK).json({ message: 'Refresh thành công!' })
     } catch (error) {
         next(error)
     }
@@ -26,22 +65,10 @@ const register = async (req, res, next) => {
 
 const getInfo = async (req, res, next) => {
     try {
-        const token = req.headers.authorization?.slice(7)
-        if (!token) {
-            return res.status(StatusCodes.UNAUTHORIZED)
-        }
+        const token = req.cookies.accessToken
 
-        const [headerEncoded, payloadEncoded, tokenSignature] = token.split('.')
-        const tokenData = `${headerEncoded}.${payloadEncoded}`
-
-        const hmac = crypto.createHmac('sha256', env.SECRETKEY)
-        const signature = hmac.update(tokenData).digest('base64url')
-
-        if (tokenSignature === signature) {
-            const payload = JSON.parse(atob(payloadEncoded))
-            const info = await userService.getUser(payload)
-            res.status(StatusCodes.OK).json(info)
-        }
+        const info = await userService.getUser(token)
+        res.status(StatusCodes.OK).json(info)
     } catch (error) {
         next(error)
     }
@@ -135,7 +162,9 @@ const getAvatar = async (req, res, next) => {
 
 export const userController = {
     login,
+    logout,
     register,
+    refresh,
     getInfo,
     uploadImageHeader,
     uploadAvatar,

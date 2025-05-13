@@ -9,6 +9,7 @@
   },
   "scripts": {
     "start": "npm run dev",
+    "auth": "cross-env BUILD_MODE=dev nodemon --exec babel-node ./src/authServer.js",
     "lint": "eslint src --ext js --report-unused-disable-directives --max-warnings 0",
     "clean": "rm -rf build && mkdir build",
     "build-babel": "babel ./src -d ./build/src",
@@ -20,6 +21,7 @@
     "@babel/runtime": "^7.22.10",
     "async-exit-hook": "^2.0.1",
     "bcrypt": "^5.1.1",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
     "dotenv": "^16.3.1",
@@ -27,9 +29,11 @@
     "fs-extra": "^11.3.0",
     "http-status-codes": "^2.3.0",
     "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",
     "mongodb": "^6.0.0",
-    "multer": "^1.4.5-lts.2"
+    "multer": "^1.4.5-lts.2",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.22.10",

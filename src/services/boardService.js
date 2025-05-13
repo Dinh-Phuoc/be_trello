@@ -1,5 +1,5 @@
 import { StatusCodes } from 'http-status-codes'
-import { cloneDeep, reduce } from 'lodash'
+import { cloneDeep } from 'lodash'
 import { boardModel } from '~/models/boardModel'
 import { cardModel } from '~/models/cardModel'
 import { columnModel } from '~/models/columnModel'
@@ -17,12 +17,12 @@ const createNew = async (reqBody) => {
     return getNewBoard
 }
 
-const getDetails = async (boardId) => {
-    const board = await boardModel.getDetails(boardId)
+const getDetails = async (boardUuid) => {
+    const board = await boardModel.getDetails(boardUuid)
     if (!board) throw new ApiError(StatusCodes.NOT_FOUND, 'Board not found')
     const resBoard = cloneDeep(board)
     resBoard.columns.forEach(column => {
-        column.cards = resBoard.cards.filter(card => card.columnId.equals(column._id))
+        column.cards = resBoard.cards.filter(card => card.columnUuid === column.uuid)
     })
 
     delete resBoard.cards
@@ -53,7 +53,7 @@ const moveCardToDifferentColumn = async (reqBody) => {
     })
 
     await cardModel.update(reqBody.currentCardId, {
-        columnId: reqBody.newColumnId
+        columnUuid: reqBody.newColumnId
     })
 
     return { updateMessage: 'Success' }

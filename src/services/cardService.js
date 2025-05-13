@@ -15,6 +15,17 @@ const createNew = async (reqBody) => {
     return getNewCard
 }
 
+const update = async (fieldName, cardUuid, userUuid, data) => {
+    const dataUpdate = {
+        ...data,
+        updatedAt: Date().now(),
+        updateBy: userUuid
+    }
+    const res = await cardModel.updateOne(fieldName, cardUuid, userUuid, dataUpdate)
+    return res
+}
+
 export const cardService = {
-    createNew
+    createNew,
+    update
 }

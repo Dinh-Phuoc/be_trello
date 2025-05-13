@@ -7,10 +7,11 @@ const INVALID_UPDATE_FIELD = ['_id', 'boardId', 'createdAt']
 // Define Collection (name & schema)
 const CARD_COLLECTION_NAME = 'cards'
 const CARD_COLLECTION_SCHEMA = Joi.object({
-    boardId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
-    columnId: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
-
+    boardUuid: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+    uuid: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
+    columnUuid: Joi.string().required().pattern(OBJECT_ID_RULE).message(OBJECT_ID_RULE_MESSAGE),
     title: Joi.string().required().min(3).max(50).trim().strict(),
+
     description: Joi.string().optional(),
 
     createdAt: Joi.date().timestamp('javascript').default(Date.now),
@@ -27,8 +28,8 @@ const createNew = async (data) => {
         const validData = await validateBeforeCreate(data)
         return await GET_DB().collection(CARD_COLLECTION_NAME).insertOne({
             ...validData,
-            boardId: new ObjectId(validData.boardId),
-            columnId: new ObjectId(validData.columnId)
+            boardUuid: validData.boardUuid,
+            columnUuid: validData.columnUuid
         })
     } catch (error) {
         throw new Error(error)
@@ -53,10 +54,10 @@ const update = async (cardId, updateData) => {
             }
         })
 
-        if (updateData.columnId) updateData.columnId = new ObjectId(updateData.columnId)
+        if (updateData.columnId) updateData.columnUuid = updateData.columnId
 
         const result = await GET_DB().collection(CARD_COLLECTION_NAME).findOneAndUpdate(
-            { _id: new ObjectId(cardId) },
+            { uuid: cardId },
             { $set: updateData },
             { returnDocument: 'after' }
         )
@@ -65,14 +66,23 @@ const update = async (cardId, updateData) => {
         throw new Error(error)
     }
 }
+const updateOne = async(fieldName, cardUuid, userUuid, data) => {
+    try {
+        const messageUpload = await GET_DB().collection(CARD_COLLECTION_NAME).updateOne(
+            { uuid: cardUuid },
+            { $set: { [fieldName]: data } }
+        )
+        return messageUpload
+    } catch (error) {
+        throw new Error(error)
+    }
+}
 
-const deleteManyByColumnId = async (columnId) => {
+const deleteManyByColumnId = async (columnUuid) => {
     try {
         const rs = await GET_DB().collection(CARD_COLLECTION_NAME).deleteMany({
-            columnId: new ObjectId(columnId)
+            columnUuid: columnUuid
         })
-        console.log('🚀 ~ rs ~ rs:', rs)
-
         return rs
     } catch (error) {
         throw new Error(error)
@@ -84,5 +94,6 @@ export const cardModel = {
     createNew,
     findOneById,
     update,
+    updateOne,
     deleteManyByColumnId
 }

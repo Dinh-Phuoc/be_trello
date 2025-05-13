@@ -20,24 +20,24 @@ const createNew = async (reqBody) => {
     return getNewColumn
 }
 
-const update = async (columnId, reqBody) => {
+const update = async (columnUuid, reqBody) => {
     const updateData = {
         ...reqBody,
         updatedAt: Date.now()
     }
-    const updatedColumn = await columnModel.update(columnId, updateData)
+    const updatedColumn = await columnModel.update(columnUuid, updateData)
 
     return updatedColumn
 }
 
 
-const deleteColumn = async (columnId) => {
-    const targetColumn = await columnModel.findOneById(columnId)
+const deleteColumn = async (columnUuid) => {
+    const targetColumn = await columnModel.findOneByUuid(columnUuid)
 
-    if (!targetColumn) throw new ApiError(StatusCodes.NOT_FOUND, 'Column not found')
+    if (!targetColumn) throw new ApiError(StatusCodes.NOT_FOUND, 'Không tìm thấy cột cần xóa')
 
-    await columnModel.deleteOneById(columnId)
-    await cardModel.deleteManyByColumnId(columnId)
+    await columnModel.deleteOneById(columnUuid)
+    await cardModel.deleteManyByColumnId(columnUuid)
     await boardModel.pullColumnOrderIds(targetColumn)
     return { deleteMessage: 'Column deleted !!!' }
 }
