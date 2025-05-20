@@ -79,8 +79,8 @@ const uploadImageHeader = async (req, res, next) => {
         if (!req.file) {
             throw new Error('Không có file nào được tải lên')
         }
-
-        const uploadedImageName = await userService.updateProfile('imageHeader', req.params.id, path.basename(req.file.path))
+        const accessToken = req.cookies.accessToken
+        const uploadedImageName = await userService.updateProfile('imageHeader', accessToken, path.basename(req.file.path))
         uploadedImageName && res.status(StatusCodes.OK).json({
             message: 'Cập nhật imageHeader thành công'
         })
@@ -94,8 +94,8 @@ const uploadAvatar = async (req, res, next) => {
         if (!req.file) {
             throw new Error('Không có file nào được tải lên')
         }
-
-        const uploadAvatarName = await userService.updateProfile('avatar', req.params.id, path.basename(req.file.path))
+        const accessToken = req.cookies.accessToken
+        const uploadAvatarName = await userService.updateProfile('avatar', accessToken, path.basename(req.file.path))
         uploadAvatarName && res.status(StatusCodes.OK).json({
             message: 'Cập nhật avatar thành công'
         })
@@ -129,11 +129,11 @@ const updateProfile = async (req, res, next) => {
 
 const getImageHeader = async (req, res, next) => {
     try {
-        const imageHeaderFileName = await userService.getOne('imageHeader', req.params.id)
-        const imageHeaderFileNamePath = path.join(__dirname, `../uploads/image-header/${req.params.id}/`, imageHeaderFileName)
+        const accessToken = req.cookies.accessToken
+        const imageHeaderFileNamePath = await userService.getOne('imageHeader', accessToken)
 
         const imageHeaderFileExists = await fs.pathExists(imageHeaderFileNamePath)
-        if (!imageHeaderFileExists) return res.status(StatusCodes.NOT_FOUND).message('Không tìm thấy ảnh')
+        if (!imageHeaderFileExists) return res.status(StatusCodes.NOT_FOUND).json({ message: 'Không tìm thấy ảnh' })
 
         res.setHeader('Access-Control-Allow-Origin', 'https://rookie.io.vn')
         res.setHeader('Access-Control-Allow-Credentials', 'true')
@@ -145,12 +145,12 @@ const getImageHeader = async (req, res, next) => {
 
 const getAvatar = async (req, res, next) => {
     try {
-        const avatarFileName = await userService.getOne('avatar', req.params.id)
-        const avatarFileNamePath = path.join(__dirname, `../uploads/avatar/${req.params.id}/`, avatarFileName)
+        const accessToken = req.cookies.accessToken
+        const avatarFileNamePath = await userService.getOne('avatar', accessToken)
 
         const avatarFileExists = await fs.pathExists(avatarFileNamePath)
+        if (!avatarFileExists) return res.status(StatusCodes.NOT_FOUND).json({ message: 'Không tìm thấy ảnh' })
 
-        if (!avatarFileExists) return res.status(StatusCodes.NOT_FOUND).message('Không tìm thấy ảnh')
         res.setHeader('Access-Control-Allow-Origin', 'https://rookie.io.vn')
         res.setHeader('Access-Control-Allow-Credentials', 'true')
         res.sendFile(avatarFileNamePath)

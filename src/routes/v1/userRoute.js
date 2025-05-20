@@ -25,16 +25,16 @@ Router.route('/refresh')
 Router.route('/profile')
     .get(authorizationMiddleware, userController.getInfo)
 
-Router.route('/profile/update/:id/:fieldName')
+Router.route('/profile/update/:fieldName')
     .patch(authorizationMiddleware, userValidation.updateProfile, userController.updateProfile)
 
-Router.route('/profile/upload/image-header/:id')
+Router.route('/profile/upload/image-header')
     .patch(
         authorizationMiddleware,
         uploadImageMiddleware.uploadImageHeader.single('image-header'),
         userController.uploadImageHeader)
 
-Router.route('/profile/upload/avatar/:id')
+Router.route('/profile/upload/avatar')
     .patch(
         authorizationMiddleware,
         uploadImageMiddleware.uploadAvatar.single('avatar'),

@@ -3,19 +3,42 @@ import bcrypt from 'bcrypt'
 import { StatusCodes } from 'http-status-codes'
 import jwt from 'jsonwebtoken'
 import { v4 } from 'uuid'
+import path from 'path'
 
 import ApiError from '~/utils/ApiError'
 import { env } from '~/config/environment'
 import generateTokens from '~/utils/generateTokens'
 
-const updateProfile = async (fieldName, id, data) => {
-    const updateResult = await userModel.updateProfile(fieldName, id, data)
-    return updateResult
+const updateProfile = async (fieldName, token, data) => {
+    try {
+        const { uuid } = jwt.verify(token, env.SECRETKEY)
+        const updateResult = await userModel.updateProfile(fieldName, uuid, data)
+        return updateResult
+    } catch (error) {
+        return error
+    }
 }
 
-const getOne = async(fieldName, uuid) => {
-    const getOne = await userModel.getOne(fieldName, uuid)
-    return getOne[fieldName]
+const getOne = async(fieldName, token) => {
+    try {
+        if (fieldName === 'imageHeader') {
+            const { uuid } = jwt.verify(token, env.SECRETKEY)
+            const result = await userModel.getOne(fieldName, uuid)
+            const filePath = path.join(__dirname, `../uploads/image-header/${uuid}/`, result[fieldName])
+            return filePath
+        }
+        if (fieldName === 'avatar') {
+            const { uuid } = jwt.verify(token, env.SECRETKEY)
+            const result = await userModel.getOne(fieldName, uuid)
+            const filePath = path.join(__dirname, `../uploads/avatar/${uuid}/`, result[fieldName])
+            return filePath
+        }
+        const { uuid } = jwt.verify(token, env.SECRETKEY)
+        const getOne = await userModel.getOne(fieldName, uuid)
+        return getOne[fieldName]
+    } catch (error) {
+        return error
+    }
 }
 
 const register = async (reqBody) => {

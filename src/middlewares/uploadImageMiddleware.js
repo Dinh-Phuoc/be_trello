@@ -1,10 +1,13 @@
 import path from 'path'
 import multer from 'multer'
 import fs from 'fs-extra'
+import jwt from 'jsonwebtoken'
+import { env } from '~/config/environment'
 
 const imageHeaderStorage = multer.diskStorage({
     destination: async (req, file, callback) => {
-        const destinationPath = path.join(__dirname, `../uploads/image-header/${req.params.id}/`)
+        const { uuid } = jwt.verify(req.cookies.accessToken, env.SECRETKEY)
+        const destinationPath = path.join(__dirname, `../uploads/image-header/${uuid}/`)
 
         await fs.ensureDir(destinationPath)
 
@@ -23,7 +26,8 @@ const imageHeaderStorage = multer.diskStorage({
 
 const avatarStorage = multer.diskStorage({
     destination: async (req, file, callback) => {
-        const destinationPath = path.join(__dirname, `../uploads/avatar/${req.params.id}/`)
+        const { uuid } = jwt.verify(req.cookies.accessToken, env.SECRETKEY)
+        const destinationPath = path.join(__dirname, `../uploads/avatar/${uuid}/`)
 
         await fs.ensureDir(destinationPath)
 
@@ -50,7 +54,8 @@ const fileFilter = (req, file, callback) => {
 
 const imageHeaderCardStorage = multer.diskStorage({
     destination: async (req, file, callback) => {
-        const destinationPath = path.join(__dirname, `../uploads/imageHeaderCard/${req.params.carduuid}/`)
+        const { uuid } = jwt.verify(req.cookies.accessToken, env.SECRETKEY)
+        const destinationPath = path.join(__dirname, `../uploads/imageHeaderCard/${uuid}/`)
 
         await fs.ensureDir(destinationPath)
 

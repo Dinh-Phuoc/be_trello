@@ -11,6 +11,7 @@ import { APIs_V1 } from './routes/v1'
 import { errorHandlingMiddleware } from './middlewares/errorHandingMiddleware'
 import { userController } from './controllers/userController'
 import cookieParser from 'cookie-parser'
+import authorizationMiddleware from './middlewares/authorizationMiddleware'
 const START_SERVER = () => {
     const app = express()
 
@@ -18,8 +19,8 @@ const START_SERVER = () => {
 
     app.use(cookieParser())
 
-    app.get('/v1/manage/users/profile/get-image/avatar/:id', cors(allowCorsForImage), userController.getAvatar)
-    app.get('/v1/manage/users/profile/get-image/image-header/:id', cors(allowCorsForImage), userController.getImageHeader)
+    app.get('/v1/manage/users/profile/get-image/avatar', cors(allowCorsForImage), authorizationMiddleware, userController.getAvatar)
+    app.get('/v1/manage/users/profile/get-image/image-header', cors(allowCorsForImage), authorizationMiddleware, userController.getImageHeader)
 
     app.use(cors(corsOptions))
 
