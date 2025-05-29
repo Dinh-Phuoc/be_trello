@@ -6,6 +6,9 @@ import { userService } from '~/services/userService'
 const login = async (req, res, next) => {
     try {
         const token = await userService.login(req.body)
+
+        if (token.statusCode) return res.status(StatusCodes.UNAUTHORIZED).json({ isSuccess: false })
+
         res.cookie('accessToken', token.accessToken, {
             httpOnly: true,
             maxAge: 60 * 60 * 2 * 1000
@@ -13,7 +16,7 @@ const login = async (req, res, next) => {
             httpOnly: true,
             maxAge: 60 * 60 * 12 * 1000
         })
-        return res.status(StatusCodes.OK).json({ message: 'Đăng nhập thành công!' })
+        return res.status(StatusCodes.OK).json({ isSuccess: false })
     } catch (error) {
         next(error)
     }
@@ -106,18 +109,20 @@ const uploadAvatar = async (req, res, next) => {
 
 const updateProfile = async (req, res, next) => {
     try {
+        const user = await userService.getUser(req.cookies.accessToken)
+        if (!user) return res.status(StatusCodes.FORBIDDEN).json({ message: 'Invalid User' })
+
         if (req.params.fieldName === 'password') {
             const data = {
-                id: req.params.id,
                 presentPassword: req.body.presentPassword,
                 newPassword: req.body.newPassword,
-                token: req.headers.authorization?.slice(7)
+                token: req.cookies.accessToken
             }
             const result = await userService.changePassword('password', data)
             return res.status(StatusCodes.OK).json(result)
         }
 
-        const updateMessage = await userService.updateProfile(req.params.fieldName, req.params.id, req.body.data)
+        const updateMessage = await userService.updateProfile(req.params.fieldName, req.cookies.accessToken, req.body.data)
         updateMessage && res.status(StatusCodes.OK).json({
             change: true,
             message: 'Cập nhật thành công'

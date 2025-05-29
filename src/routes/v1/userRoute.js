@@ -21,12 +21,17 @@ Router.route('/register')
 Router.route('/refresh')
     .post(userController.refresh)
 
-//---------------------------------------------------------//
+//---------------------Get Profile---------------------------//
+
 Router.route('/profile')
     .get(authorizationMiddleware, userController.getInfo)
 
+//---------------------Update Profile-------------------------//
+
 Router.route('/profile/update/:fieldName')
     .patch(authorizationMiddleware, userValidation.updateProfile, userController.updateProfile)
+
+//---------------------Update Images-------------------------//
 
 Router.route('/profile/upload/image-header')
     .patch(

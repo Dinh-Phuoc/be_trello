@@ -2,9 +2,9 @@ import jwt from 'jsonwebtoken'
 import { env } from '~/config/environment'
 
 const generateTokens = payload => {
-    const accessToken = jwt.sign(payload, env.SECRETKEY, { expiresIn: '1m' })
+    const accessToken = jwt.sign(payload, env.SECRETKEY, { expiresIn: '30m' })
 
-    const refreshToken = jwt.sign(payload, env.REFRESH_SECRETKEY, { expiresIn: '2m' })
+    const refreshToken = jwt.sign(payload, env.REFRESH_SECRETKEY, { expiresIn: '2w' })
 
     return { accessToken, refreshToken }
 }

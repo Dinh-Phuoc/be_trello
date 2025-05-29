@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken'
 const authorizationMiddleware = (req, res, next) => {
     try {
         const token = req.cookies.accessToken
-        if (!token) {
+        if (!token || token === 'undefined') {
             return res.status(StatusCodes.UNAUTHORIZED).json({ message: 'Chưa đăng nhập' })
         }
         jwt.verify(token, env.SECRETKEY)

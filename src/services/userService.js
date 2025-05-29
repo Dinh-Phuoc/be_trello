@@ -21,19 +21,19 @@ const updateProfile = async (fieldName, token, data) => {
 
 const getOne = async(fieldName, token) => {
     try {
+        const { uuid } = jwt.verify(token, env.SECRETKEY)
+
         if (fieldName === 'imageHeader') {
-            const { uuid } = jwt.verify(token, env.SECRETKEY)
             const result = await userModel.getOne(fieldName, uuid)
             const filePath = path.join(__dirname, `../uploads/image-header/${uuid}/`, result[fieldName])
             return filePath
         }
         if (fieldName === 'avatar') {
-            const { uuid } = jwt.verify(token, env.SECRETKEY)
             const result = await userModel.getOne(fieldName, uuid)
             const filePath = path.join(__dirname, `../uploads/avatar/${uuid}/`, result[fieldName])
             return filePath
         }
-        const { uuid } = jwt.verify(token, env.SECRETKEY)
+
         const getOne = await userModel.getOne(fieldName, uuid)
         return getOne[fieldName]
     } catch (error) {
@@ -110,7 +110,6 @@ const logout = async (token) => {
 
 const changePassword = async (fieldName, data) => {
     const payload = {
-        uuid: data.uuid,
         presentPassword: data.presentPassword,
         newPassword: data.newPassword
     }
@@ -119,22 +118,26 @@ const changePassword = async (fieldName, data) => {
         return { message: 'Bro chưa xác thực' }
     }
 
-    const isValidToken = jwt.verify(token, env.SECRETKEY)
+    try {
+        const decoded = jwt.verify(token, env.SECRETKEY)
 
-    if (!isValidToken) {
-        return new ApiError(StatusCodes.UNAUTHORIZED, { message: 'Chưa đăng nhập' })
+        if (!decoded) {
+            return new ApiError(StatusCodes.UNAUTHORIZED, { message: 'Chưa đăng nhập' })
+        }
+
+        const info = await userModel.getUser('uuid', decoded.uuid)
+
+        const isMatch = await bcrypt.compare(payload.presentPassword, info.password)
+        if (!isMatch) {
+            return { change: false, message: 'Mật khẩu hiện tại không chính xác' }
+        }
+
+        await userModel.updateProfile(fieldName, decoded.uuid, payload.newPassword)
+
+        return { change: true, message: 'Đổi mật khẩu thành công' }
+    } catch (error) {
+        return error
     }
-
-    const info = await userModel.getUser('uuid', payload.uuid)
-
-    const isMatch = await bcrypt.compare(payload.presentPassword, info.password)
-    if (!isMatch) {
-        return { change: false, message: 'Mật khẩu hiện tại không chính xác' }
-    }
-
-    await userService.updateProfile(fieldName, payload.id, payload.newPassword)
-
-    return { change: true, message: 'Đổi mật khẩu thành công' }
 }
 
 const getUser = async(token) => {
