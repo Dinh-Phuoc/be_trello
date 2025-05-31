@@ -16,7 +16,7 @@ const login = async (req, res, next) => {
             httpOnly: true,
             maxAge: 60 * 60 * 12 * 1000
         })
-        return res.status(StatusCodes.OK).json({ isSuccess: false })
+        return res.status(StatusCodes.OK).json({ isSuccess: true })
     } catch (error) {
         next(error)
     }
@@ -60,7 +60,8 @@ const refresh = async (req, res, next) => {
 const register = async (req, res, next) => {
     try {
         const messageRegister = await userService.register(req.body)
-        res.status(StatusCodes.OK).json(messageRegister)
+        if (messageRegister.statusCode === 409) return res.status(StatusCodes.CONFLICT).json({ message: 'Tài khoản đã tồn tại', status: 409 })
+        res.status(StatusCodes.OK).json({ message: messageRegister, status: 200 })
     } catch (error) {
         next(error)
     }

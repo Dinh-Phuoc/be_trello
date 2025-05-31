@@ -41,9 +41,9 @@ const register = async (data) => {
 
 const getUser = async (fieldName, data) => {
     try {
-        return await GET_DB().collection(USER_COLLECTION_NAME).findOne({
-            [fieldName]: data
-        })
+        return await GET_DB().collection(USER_COLLECTION_NAME).findOne(
+            { [fieldName]: data }
+        )
     } catch (error) {
         throw new Error(error)
     }
@@ -72,7 +72,7 @@ const getOne = async(fieldName, uuid) => {
     try {
         return await GET_DB().collection(USER_COLLECTION_NAME).findOne(
             { uuid: uuid },
-            { projection: { [fieldName]: 1, _id: 0 } }
+            { projection: { [fieldName]: 1 } }
         )
     } catch (error) {
         throw new Error(error)

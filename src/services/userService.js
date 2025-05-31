@@ -45,8 +45,11 @@ const register = async (reqBody) => {
     const newUser = {
         ...reqBody
     }
+    const user = await userModel.getUser('userName', newUser.userName)
+    if (user) return new ApiError(StatusCodes.CONFLICT, 'Tài khoản đã tồn tại')
+
     const createdUser = await userModel.register(newUser)
-    const message = createdUser ? 'Tạo tài khoản thành công' : 'Tạo tài khoản thất bại'
+    const message = createdUser && 'Tạo tài khoản thành công'
     return message
 }
 
