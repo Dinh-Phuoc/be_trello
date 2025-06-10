@@ -54,8 +54,6 @@ const update = async (cardId, updateData) => {
             }
         })
 
-        if (updateData.columnId) updateData.columnUuid = updateData.columnId
-
         const result = await GET_DB().collection(CARD_COLLECTION_NAME).findOneAndUpdate(
             { uuid: cardId },
             { $set: updateData },
@@ -66,11 +64,21 @@ const update = async (cardId, updateData) => {
         throw new Error(error)
     }
 }
-const updateOne = async(fieldName, cardUuid, userUuid, data) => {
+const updateOne = async(fieldName, cardUuid, updateData) => {
     try {
+        Object.keys(updateData).forEach(fieldName => {
+            if (INVALID_UPDATE_FIELD.includes(fieldName)) {
+                delete updateData[fieldName]
+            }
+        })
+
         const messageUpload = await GET_DB().collection(CARD_COLLECTION_NAME).updateOne(
             { uuid: cardUuid },
-            { $set: { [fieldName]: data } }
+            { $set: {
+                [fieldName]: updateData.data,
+                updateBy: updateData.updateBy,
+                updatedAt: updateData.updatedAt
+            } }
         )
         return messageUpload
     } catch (error) {
@@ -88,6 +96,18 @@ const deleteManyByColumnId = async (columnUuid) => {
         throw new Error(error)
     }
 }
+
+const getOne = async(fieldName, cardUuid) => {
+    try {
+        const result = await GET_DB().collection(CARD_COLLECTION_NAME).findOne({
+            uuid: cardUuid
+        })
+
+        return result[fieldName]
+    } catch (error) {
+        throw Error(error)
+    }
+}
 export const cardModel = {
     CARD_COLLECTION_NAME,
     CARD_COLLECTION_SCHEMA,
@@ -95,5 +115,6 @@ export const cardModel = {
     findOneById,
     update,
     updateOne,
+    getOne,
     deleteManyByColumnId
 }

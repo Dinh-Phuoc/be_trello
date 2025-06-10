@@ -10,11 +10,11 @@ const Router = express.Router()
 Router.route('/')
     .post(cardValidation.createNew, cardController.createNew)
 
-Router.route('/upload/image-header-card/:carduuid/:useruuid')
-    .post(
+Router.route('/upload/card-cover/:cardUuid')
+    .patch(
         authorizationMiddleware,
-        uploadImageMiddleware.uploadImageHeaderCard.single('image-header-card'),
-        cardController.uploadImageHeaderCard
+        uploadImageMiddleware.uploadCardCover.single('card-cover'),
+        cardController.uploadCardCover
     )
 
 export const cardRoute = Router
