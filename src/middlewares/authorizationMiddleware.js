@@ -1,6 +1,7 @@
 import { StatusCodes } from 'http-status-codes'
 import { env } from '~/config/environment'
 import jwt from 'jsonwebtoken'
+
 const authorizationMiddleware = (req, res, next) => {
     try {
         const token = req.cookies.accessToken
@@ -11,7 +12,8 @@ const authorizationMiddleware = (req, res, next) => {
 
         next()
     } catch (error) {
-        if (error.name === 'TokenExpiredError') res.status(StatusCodes.UNAUTHORIZED).json({ message: error.message })
+        if (error.name === 'TokenExpiredError')
+            res.status(StatusCodes.UNAUTHORIZED).json({ message: error.message })
     }
 }
 

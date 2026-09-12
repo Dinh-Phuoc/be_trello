@@ -1,9 +1,12 @@
 import express from 'express'
 import { userController } from '~/controllers/userController'
+import { googleController } from '~/controllers/googleController'
 import authorizationMiddleware from '~/middlewares/authorizationMiddleware'
 import { uploadImageMiddleware } from '~/middlewares/uploadImageMiddleware'
+import { authLimiter, registerLimiter, googleLimiter } from '~/middlewares/rateLimiter'
 
 import { userValidation } from '~/validations/userValidation'
+import { googleValidation } from '~/validations/googleValidation'
 
 const Router = express.Router()
 
@@ -20,6 +23,11 @@ Router.route('/register')
 
 Router.route('/refresh')
     .post(userController.refresh)
+
+//---------------------Google OAuth---------------------------//
+
+Router.route('/google')
+    .post(googleValidation.loginGoogle, googleLimiter, googleController.loginGoogle)
 
 //---------------------Get Profile---------------------------//
 
