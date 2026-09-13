@@ -19,7 +19,7 @@ const updateProfile = async (fieldName, token, data) => {
     }
 }
 
-const getOne = async(fieldName, token) => {
+const getOne = async (fieldName, token) => {
     try {
         const { uuid } = jwt.verify(token, env.SECRETKEY)
 
@@ -54,21 +54,25 @@ const register = async (reqBody) => {
 }
 
 const login = async (body) => {
-    const user = await userModel.getUser('userName', body.userName)
-    if (!user) return new ApiError(StatusCodes.UNAUTHORIZED, 'Tài khoản không tồn tại')
+    try {
+        const user = await userModel.getUser('userName', body.userName)
+        if (!user) return new ApiError(StatusCodes.UNAUTHORIZED, 'Tài khoản không tồn tại')
 
-    const isMatch = await bcrypt.compare(body.password, user.password)
-    if (!isMatch) return new ApiError(StatusCodes.FORBIDDEN, 'Tài khoản hoặc mật khẩu không chính xác')
+        const isMatch = await bcrypt.compare(body.password, user.password)
+        if (!isMatch) return new ApiError(StatusCodes.FORBIDDEN, 'Tài khoản hoặc mật khẩu không chính xác')
 
-    const payload = {
-        uuid: user.uuid,
-        jit: v4(),
-        role: user.role
+        const payload = {
+            uuid: user.uuid,
+            jit: v4(),
+            role: user.role
+        }
+
+        const token = generateTokens(payload)
+        await userModel.updateProfile('refreshToken', payload.uuid, token.refreshToken)
+        return token
+    } catch (error) {
+        return new ApiError(StatusCodes.UNAUTHORIZED, error)
     }
-
-    const token = generateTokens(payload)
-    await userModel.updateProfile('refreshToken', payload.uuid, token.refreshToken)
-    return token
 }
 
 const refresh = async (cookies) => {
@@ -143,13 +147,14 @@ const changePassword = async (fieldName, data) => {
     }
 }
 
-const getUser = async(token) => {
+const getUser = async (token) => {
     try {
         const decoded = jwt.verify(token, env.SECRETKEY)
         // eslint-disable-next-line no-unused-vars
         const { password, ...info } = await userModel.getUser('uuid', decoded.uuid)
         return info
     } catch (error) {
+
         return new ApiError(StatusCodes.FORBIDDEN, error)
     }
 }

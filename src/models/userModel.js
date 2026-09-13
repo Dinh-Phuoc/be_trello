@@ -14,6 +14,7 @@ const USER_COLLECTION_SCHEMA = Joi.object({
     phone: Joi.string().min(3).max(256).trim().strict().default(''),
     avatar: Joi.string().trim().default(''),
     imageHeader: Joi.string().trim().default(''),
+    googleId: Joi.string().trim().default(''),
     refreshToken: Joi.string().trim().default(''),
 
     _destroy: Joi.boolean().default(false),

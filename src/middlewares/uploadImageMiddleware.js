@@ -52,10 +52,10 @@ const fileFilter = (req, file, callback) => {
     }
 }
 
-const imageHeaderCardStorage = multer.diskStorage({
+const cardCoverStorage = multer.diskStorage({
     destination: async (req, file, callback) => {
-        const { uuid } = jwt.verify(req.cookies.accessToken, env.SECRETKEY)
-        const destinationPath = path.join(__dirname, `../uploads/imageHeaderCard/${uuid}/`)
+        const cardUuid = req.params.cardUuid
+        const destinationPath = path.join(__dirname, `../uploads/card-cover/${cardUuid}/`)
 
         await fs.ensureDir(destinationPath)
 
@@ -88,8 +88,8 @@ const uploadAvatar = multer({
     }
 })
 
-const uploadImageHeaderCard = multer({
-    storage: imageHeaderCardStorage,
+const uploadCardCover = multer({
+    storage: cardCoverStorage,
     fileFilter,
     limits: {
         fileSize: 1024*1024*5
@@ -99,5 +99,5 @@ const uploadImageHeaderCard = multer({
 export const uploadImageMiddleware = {
     uploadImageHeader,
     uploadAvatar,
-    uploadImageHeaderCard
+    uploadCardCover
 }

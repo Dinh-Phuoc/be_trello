@@ -1,0 +1,24 @@
+# docker-compose.yml
+version: '3.9'
+
+services:
+  redis:
+    image: redis:7.2-alpine
+    container_name: trello_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      # Persistent data - giữ data khi restart container
+      - redis_data:/data
+      # Load config & custom commands
+      - ./config/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    command: redis-server /usr/local/etc/redis/redis.conf
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  redis_data:

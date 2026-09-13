@@ -2,6 +2,7 @@ import { StatusCodes } from 'http-status-codes'
 import fs from 'fs-extra'
 import path from 'path'
 import { userService } from '~/services/userService'
+import { buildCookieOptions, serializeCookie } from '~/utils/cookieOptions'
 
 const login = async (req, res, next) => {
     try {
@@ -9,13 +10,11 @@ const login = async (req, res, next) => {
 
         if (token.statusCode) return res.status(StatusCodes.UNAUTHORIZED).json({ isSuccess: false })
 
-        res.cookie('accessToken', token.accessToken, {
-            httpOnly: true,
-            maxAge: 60 * 60 * 2 * 1000
-        }).cookie('refreshToken', token.refreshToken, {
-            httpOnly: true,
-            maxAge: 60 * 60 * 12 * 1000
-        })
+        // Set cookie thủ công qua res.setHeader để bypass mọi issue với res.cookie()
+        const accessTokenCookie = serializeCookie('accessToken', token.accessToken, buildCookieOptions(60 * 60 * 2 * 1000))
+        const refreshTokenCookie = serializeCookie('refreshToken', token.refreshToken, buildCookieOptions(60 * 60 * 12 * 1000))
+        res.setHeader('Set-Cookie', [accessTokenCookie, refreshTokenCookie])
+
         return res.status(StatusCodes.OK).json({ isSuccess: true })
     } catch (error) {
         next(error)
@@ -44,13 +43,11 @@ const refresh = async (req, res, next) => {
             return res.status(newToken.statusCode).json({ statusCode: newToken.message })
         }
 
-        res.cookie('accessToken', newToken.accessToken, {
-            httpOnly: true,
-            maxAge: 60 * 2 * 1000
-        }).cookie('refreshToken', newToken.refreshToken, {
-            httpOnly: true,
-            maxAge: 60 * 60 * 12 * 1000
-        })
+        // Set cookie thủ công qua res.setHeader để bypass mọi issue với res.cookie()
+        const accessTokenCookie = serializeCookie('accessToken', newToken.accessToken, buildCookieOptions(60 * 2 * 1000))
+        const refreshTokenCookie = serializeCookie('refreshToken', newToken.refreshToken, buildCookieOptions(60 * 60 * 12 * 1000))
+        res.setHeader('Set-Cookie', [accessTokenCookie, refreshTokenCookie])
+
         return res.status(StatusCodes.OK).json({ message: 'Refresh thành công!' })
     } catch (error) {
         next(error)
