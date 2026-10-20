@@ -4,7 +4,7 @@ import cors from 'cors'
 import { corsOptions, allowCorsForImage } from './config/cors'
 import exitHook from 'async-exit-hook'
 import path from 'path'
-
+import 'module-alias/register'
 import { CONNECT_DB, CLOSE_DB } from './config/mongodb'
 import { env } from './config/environment'
 import { APIs_V1 } from './routes/v1'
