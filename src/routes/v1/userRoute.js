@@ -26,8 +26,12 @@ Router.route('/refresh')
 
 //---------------------Google OAuth---------------------------//
 
+// Router.route('/google')
+//     .post(googleValidation.loginGoogle, googleLimiter, googleController.loginGoogle)
+
+
 Router.route('/google')
-    .post(googleValidation.loginGoogle, googleLimiter, googleController.loginGoogle)
+    .post(googleValidation.loginGoogle, googleController.loginGoogle)
 
 //---------------------Get Profile---------------------------//
 

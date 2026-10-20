@@ -13,7 +13,7 @@ import { userController } from './controllers/userController'
 import cookieParser from 'cookie-parser'
 import authorizationMiddleware from './middlewares/authorizationMiddleware'
 import { cardController } from './controllers/cardController'
-import { closeRedis, waitForRedisReady } from './config/redis'
+// import { closeRedis, waitForRedisReady } from './config/redis'
 
 const START_SERVER = () => {
     const app = express()
@@ -50,7 +50,7 @@ const START_SERVER = () => {
     exitHook(async () => {
         console.log('Server is Shutting Down')
         await CLOSE_DB()
-        await closeRedis()
+        // await closeRedis()
     })
 }
 
@@ -62,8 +62,8 @@ const START_SERVER = () => {
 
         // ===== Bước 2: Đợi Redis ready =====
         // rate-limit-redis cần Redis ready trước khi mount routes
-        await waitForRedisReady()
-        console.log('Redis is ready')
+        // await waitForRedisReady()
+        // console.log('Redis is ready')
 
         // ===== Bước 3: Start server =====
         START_SERVER()
