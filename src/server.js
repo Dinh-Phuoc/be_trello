@@ -13,6 +13,7 @@ import { userController } from './controllers/userController'
 import cookieParser from 'cookie-parser'
 import authorizationMiddleware from './middlewares/authorizationMiddleware'
 import { cardController } from './controllers/cardController'
+import { userRoute } from './routes/v1/userRoute'
 // import { closeRedis, waitForRedisReady } from './config/redis'
 
 const START_SERVER = () => {
@@ -32,6 +33,8 @@ const START_SERVER = () => {
 
     // Áp dụng API rate limiter cho tất cả /v1 routes (100 req/15min)
     // app.use('/v1', apiLimiter, APIs_V1)
+    app.use('/auth', userRoute)
+
     app.use('/v1', APIs_V1)
 
     //Middleware
