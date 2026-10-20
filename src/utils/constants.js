@@ -1,5 +1,5 @@
 export const WHITELIST_DOMAINS = [
-    process.env.FE_URL
+    'https://sariii-trello.vercel.app'
 ]
 
 export const BOARD_TYPES = {
