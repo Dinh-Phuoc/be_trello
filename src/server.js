@@ -13,13 +13,10 @@ import { userController } from './controllers/userController'
 import cookieParser from 'cookie-parser'
 import authorizationMiddleware from './middlewares/authorizationMiddleware'
 import { cardController } from './controllers/cardController'
-import { apiLimiter } from './middlewares/rateLimiter'
 import { closeRedis, waitForRedisReady } from './config/redis'
 
 const START_SERVER = () => {
     const app = express()
-
-    app.enable('trust proxy')
 
     app.use(cookieParser())
 
@@ -34,7 +31,8 @@ const START_SERVER = () => {
     app.use(express.json())
 
     // Áp dụng API rate limiter cho tất cả /v1 routes (100 req/15min)
-    app.use('/v1', apiLimiter, APIs_V1)
+    // app.use('/v1', apiLimiter, APIs_V1)
+    app.use('/v1', APIs_V1)
 
     //Middleware
     app.use(errorHandlingMiddleware)
