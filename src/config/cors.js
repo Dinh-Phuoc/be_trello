@@ -10,9 +10,6 @@ export const corsOptions = {
             return callback(null, true)
         }
 
-        console.log('🚀 ~ origin:', origin)
-        console.log('🚀 ~ WHITELIST_DOMAINS:', WHITELIST_DOMAINS)
-        console.log('🚀 ~ WHITELIST_DOMAINS.includes(origin):', WHITELIST_DOMAINS.includes(origin))
         if (WHITELIST_DOMAINS.includes(origin)) {
             return callback(null, true)
         }

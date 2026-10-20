@@ -1,5 +1,6 @@
 export const WHITELIST_DOMAINS = [
-    'https://sariii-trello.vercel.app'
+    'https://sariii-trello.vercel.app',
+    'sariii-trello.vercel.app'
 ]
 
 export const BOARD_TYPES = {
