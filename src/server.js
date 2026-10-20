@@ -21,11 +21,13 @@ const START_SERVER = () => {
 
     app.use(cookieParser())
 
-    app.get('/v1/manage/users/profile/get-image/avatar', cors(allowCorsForImage), authorizationMiddleware, userController.getAvatar)
-    app.get('/v1/manage/users/profile/get-image/image-header', cors(allowCorsForImage), authorizationMiddleware, userController.getImageHeader)
-    app.get('/v1/cards/get-image/card-cover/:carduuid', cors(allowCorsForImage), authorizationMiddleware, cardController.getCardCover)
-
-    app.use(cors(corsOptions))
+    // app.get('/v1/manage/users/profile/get-image/avatar', cors(allowCorsForImage), authorizationMiddleware, userController.getAvatar)
+    // app.get('/v1/manage/users/profile/get-image/image-header', cors(allowCorsForImage), authorizationMiddleware, userController.getImageHeader)
+    // app.get('/v1/cards/get-image/card-cover/:carduuid', cors(allowCorsForImage), authorizationMiddleware, cardController.getCardCover)
+    app.get('/v1/manage/users/profile/get-image/avatar', authorizationMiddleware, userController.getAvatar)
+    app.get('/v1/manage/users/profile/get-image/image-header', authorizationMiddleware, userController.getImageHeader)
+    app.get('/v1/cards/get-image/card-cover/:carduuid', authorizationMiddleware, cardController.getCardCover)
+    // app.use(cors(corsOptions))
 
     app.use('/uploads', express.static(path.join(__dirname, 'upload')))
 
