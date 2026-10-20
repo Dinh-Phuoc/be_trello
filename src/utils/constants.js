@@ -1,6 +1,5 @@
 export const WHITELIST_DOMAINS = [
-    'http://rookie.io.vn',
-    'https://rookie.io.vn'
+    process.env.FE_URL
 ]
 
 export const BOARD_TYPES = {
