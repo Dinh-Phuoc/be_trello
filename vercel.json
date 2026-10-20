@@ -1,5 +1,4 @@
 {
     "version": 2,
-    "builds": [{ "src": "build/src/server.js", "use": "@vercel/node" }],
-    "routes": [{ "src": "/(.*)", "dest": "build/src/server.js" }]
+    "rewrites": [{ "source": "/(.*)", "destination": "/api" }]
 }

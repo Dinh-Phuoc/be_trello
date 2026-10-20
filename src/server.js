@@ -70,16 +70,13 @@ if (env.BUILD_MODE === 'prod') {
     app.listen(env.APP_PORT, () => {
         console.log(`Production: Hello Sariii, You are running at ${ env.APP_PORT }/`)
     })
-} else {
-    app.listen(env.APP_PORT, env.APP_HOST, () => {
-        console.log(`Dev: Hello Sariii, You are running at ${ env.APP_HOST }:${ env.APP_PORT }/`)
+
+    exitHook(async () => {
+        console.log('Server is Shutting Down')
+        await CLOSE_DB()
+        // await closeRedis()
     })
 }
 
-exitHook(async () => {
-    console.log('Server is Shutting Down')
-    await CLOSE_DB()
-    // await closeRedis()
-})
 
 export default app
