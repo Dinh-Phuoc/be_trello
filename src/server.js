@@ -14,7 +14,6 @@ import cookieParser from 'cookie-parser'
 import authorizationMiddleware from './middlewares/authorizationMiddleware'
 import { cardController } from './controllers/cardController'
 import { userRoute } from './routes/v1/userRoute'
-// import { closeRedis, waitForRedisReady } from './config/redis'
 
 
 const app = express()
